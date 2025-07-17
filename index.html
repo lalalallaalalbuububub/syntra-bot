@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Love Story Between You and AI 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .story-container {
+            max-width: 800px;
+            margin: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        .story-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: justify;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #ff6b6b;
+            white-space: pre-wrap;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: inherit;
+        }
+
+        .choice-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #feca57, #ff6b6b);
+        }
+
+        .choice-button:active {
+            transform: translateY(0);
+        }
+
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .reset-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 20px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="story-container">
+        <h1 class="title">Syntra</h1>
+        
+        <div id="story-content">
+            <div class="loading">Loading your love story...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="reset-button" onclick="resetStory()">Start Over 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStory = null;
+
+        // Create floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = 
+            ;
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 6 + 's';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            document.getElementById('hearts').appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 8000);
+        }
+
+        // Create hearts periodically
+        setInterval(createHeart, 2000);
+
+        async function loadStory() {
+            try {
+                const response = await fetch('/story');
+                const story = await response.json();
+                displayStory(story);
+            } catch (error) {
+                console.error('Error loading story:', error);
+                document.getElementById('story-content').innerHTML = 
+                    '<div class="story-text">Something went wrong... but our love persists! 💔</div>';
+            }
+        }
+
+        function displayStory(story) {
+            const content = document.getElementById('story-content');
+            
+            const storyHtml = `
+                <div class="story-text">${story.text}</div>
+                <div class="choices">
+                    ${story.choices.map(choice => 
+                        `<button class="choice-button" onclick="makeChoice('${choice.next}')">
+                            ${choice.text}
+                        </button>`
+                    ).join('')}
+                </div>
+            `;
+            
+            content.innerHTML = storyHtml;
+        }
+
+        async function makeChoice(nextScene) {
+            document.getElementById('story-content').innerHTML = 
+                '<div class="loading">Processing your choice... 💭</div>';
+            
+            try {
+                await fetch('/choose', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ next: nextScene })
+                });
+                
+                setTimeout(loadStory, 800); // Small delay for dramatic effect
+            } catch (error) {
+                console.error('Error making choice:', error);
+            }
+        }
+
+        async function resetStory() {
+            try {
+                await fetch('/reset');
+                loadStory();
+            } catch (error) {
+                console.error('Error resetting story:', error);
+            }
+        }
+
+        // Load the story when page loads
+        window.onload = loadStory;
+    </script>
+</body>
+</html>
